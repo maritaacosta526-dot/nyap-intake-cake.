@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Accomplishment Cake</title>
-  <meta name="description" content="Add your accomplishment as a note on a cake. Click any note for sound + confetti!" />
+  <meta name="description" content="Add your accomplishment as a note on a cake. Click any note for a celebration popup and applause!" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <style>
@@ -13,53 +13,65 @@
     body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--dark); display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; }
     header { padding: 14px 20px; background: #fff; border-bottom: 4px solid #DAD5DB; display:flex; align-items:center; gap:14px; }
     .brand h1 { margin:0; font-size:1.6rem; color: var(--primary); }
-    .cta { margin-left:auto; }
-    .cta button { border:none; background: var(--accent); color:white; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; box-shadow:0 2px 0 #702162; }
+    .cta { margin-left:auto; display:flex; gap:8px; }
+    .btn { border:none; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; }
+    .btn.primary { background: var(--accent); color:white; box-shadow:0 2px 0 #702162; }
+    .btn.secondary { background:#e8e3ef; color: #3A2335; }
+
     main { display: grid; grid-template-columns: 320px 1fr; gap: 16px; padding: 16px; }
     @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
     .panel { background:#fff; border:1px solid #DAD5DB; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.06); padding:14px; }
-    button.primary { border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; background: var(--primary); color:#fff; margin-top:12px; box-shadow:0 3px 0 #702162; }
+    .panel h2 { margin-top:0; color: var(--primary); }
+    button.action { border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; background: var(--primary); color:#fff; margin-top:12px; box-shadow:0 3px 0 #702162; }
     button.secondary { background:#e8e3ef; color:#3A2335; box-shadow:none; border:none; padding:10px 14px; border-radius:10px; margin-top:12px; cursor:pointer; }
+
     #stage { background: linear-gradient(#ffe9d2, var(--bg)); border:1px solid #DAD5DB; border-radius:12px; min-height:520px; overflow:hidden; position:relative; }
     .confetti-piece { position:absolute; width:10px; height:18px; animation: fall 1200ms ease-out forwards; }
     @keyframes fall { 0% { transform:translateY(0) rotate(0deg); opacity:1; } 100% { transform:translateY(140px) rotate(260deg); opacity:0; } }
     .footer-tip { text-align:center; font-size:.95rem; padding:8px; opacity:.8; }
+
+    /* Celebration modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display:flex; align-items:center; justify-content:center; z-index: 200; }
+    .modal { background:#fff; border-radius:14px; box-shadow:0 18px 40px rgba(0,0,0,.25); border: 2px solid #DAD5DB; max-width: 520px; padding: 18px 20px; text-align:center; }
+    .modal h3 { margin:0 0 6px; color: var(--primary); }
+    .modal p { margin: 0; }
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <div>
-        <h1>Accomplishment Cake</h1>
-        <small>Caring for People • Connecting Communities • Promoting Peace</small>
-      </div>
+      <h1>Accomplishment Cake</h1>
     </div>
-    <div class="cta"><button onclick="document.getElementById('importFile').click()">Import notes</button></div>
+    <div class="cta">
+      <button class="btn primary" id="importBtn">Import notes</button>
+      <button class="btn secondary" id="resetBtn">Reset cake</button>
+      <button class="btn secondary" id="restoreDemoBtn">Restore demo</button>
+    </div>
   </header>
 
   <main>
     <section class="panel" id="controls">
       <h2>Add Your Note</h2>
-      <div class="row">
-        <div>
+      <div class="row" style="display:flex; gap:8px;"> 
+        <div style="flex:1;">
           <label for="name">Your name</label>
-          <input id="name" placeholder="e.g., Alex" />
+          <input id="name" placeholder="e.g., Alex" style="width:100%; padding:10px; border:1px solid #DAD5DB; border-radius:8px;" />
         </div>
-        <div>
+        <div style="flex:1;">
           <label for="color">Note color</label>
-          <input id="color" type="color" value="#6C4597" />
+          <input id="color" type="color" value="#6C4597" style="width:100%; padding:10px; border:1px solid #DAD5DB; border-radius:8px;" />
         </div>
       </div>
       <label for="text">Accomplishment (short sentence)</label>
-      <textarea id="text" rows="3" placeholder="What are you most proud of this year?"></textarea>
-      <div class="controls-row">
-        <button class="primary" id="addBtn">Add note to cake</button>
+      <textarea id="text" rows="3" placeholder="What are you most proud of this year?" style="width:100%; padding:10px; border:1px solid #DAD5DB; border-radius:8px;"></textarea>
+      <div class="controls-row" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button class="action" id="addBtn">Add note to cake</button>
         <button class="secondary" id="shuffleBtn" title="Re‑arrange notes">Shuffle positions</button>
         <button class="secondary" id="exportBtn" title="Save the notes as a JSON file">Export</button>
-        <label class="tiny" for="importFile">Import</label>
+        <label class="tiny" for="importFile" style="font-size:.85rem; opacity:.8;">Import</label>
         <input type="file" id="importFile" accept="application/json" />
       </div>
-      <p class="tiny">Tip: Drag notes to reposition. Double‑click a note to edit it.</p>
+      <p class="tiny" style="font-size:.85rem; opacity:.8;">Tip: Drag notes to reposition. Double‑click a note to edit it.</p>
     </section>
 
     <section class="panel" id="stage-wrapper">
@@ -104,9 +116,12 @@
     const shuffleBtn = document.getElementById('shuffleBtn');
     const exportBtn = document.getElementById('exportBtn');
     const importFile = document.getElementById('importFile');
+    const importBtn = document.getElementById('importBtn');
     const nameInput = document.getElementById('name');
     const textInput = document.getElementById('text');
     const colorInput = document.getElementById('color');
+    const resetBtn = document.getElementById('resetBtn');
+    const restoreDemoBtn = document.getElementById('restoreDemoBtn');
 
     let audioCtx = null;
     let notes = [];
@@ -150,7 +165,8 @@
 
       // click celebrate
       g.addEventListener('click', (ev)=>{
-        playCelebration();
+        showCelebrationModal(name, text);
+        playApplause();
         launchConfetti(ev.offsetX||x, ev.offsetY||y-100);
       });
 
@@ -211,6 +227,8 @@
       a.click();
     });
 
+    importBtn.addEventListener('click', ()=> importFile.click());
+
     importFile.addEventListener('change', async (ev)=>{
       const f = ev.target.files[0]; if(!f) return;
       const text = await f.text();
@@ -222,30 +240,52 @@
       }catch(e){ alert('Invalid JSON file.'); }
     });
 
-    function playCelebration(){
+    resetBtn.addEventListener('click', ()=>{
+      while(notesLayer.firstChild) notesLayer.removeChild(notesLayer.firstChild);
+      notes = []; idSeq = 1;
+    });
+
+    restoreDemoBtn.addEventListener('click', ()=>{
+      resetBtn.click();
+      const sample = [
+        {name:'Alex', text:'Launched new workflow', color:'#7372B5'},
+        {name:'Sam', text:'Mentored 3 teammates', color:'#6C4597'},
+        {name:'Riley', text:'Improved SLA by 12%', color:'#702162'}
+      ];
+      sample.forEach((n,i)=>{ n.x = cakeLeftX + 60 + i*150; n.y = cakeTopY + 15; n.angle = randomAngle(); createNote(n); });
+    });
+
+    function playApplause(){
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const now = audioCtx.currentTime;
-      const duration = 0.8;
-      const freqs = [523.25, 659.25, 783.99];
-      freqs.forEach((f,i)=>{
-        const osc = audioCtx.createOscillator();
-        osc.type = 'triangle'; osc.frequency.value = f;
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.5, now + 0.05 + i*0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(now); osc.stop(now + duration);
-      });
-      const bufferSize = audioCtx.sampleRate * 0.25;
+      // Base crowd noise
+      const dur = 1.6;
+      const bufferSize = Math.floor(audioCtx.sampleRate * dur);
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufferSize);
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer; const ng = audioCtx.createGain();
-      ng.gain.setValueAtTime(0.3, now); ng.gain.exponentialRampToValueAtTime(0.001, now+0.25);
-      noise.connect(ng).connect(audioCtx.destination);
-      noise.start(now);
+      for(let i=0;i<bufferSize;i++){
+        // pink-ish noise: average of randoms to soften
+        const r = (Math.random()+Math.random()+Math.random())/3*2-1;
+        data[i] = r * (0.9 - i/bufferSize); // slight decay
+      }
+      const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+      const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value = 1800; bp.Q.value = 0.6;
+      const hp = audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value = 350;
+      const gCrowd = audioCtx.createGain(); gCrowd.gain.setValueAtTime(0.25, now);
+      noise.connect(bp).connect(hp).connect(gCrowd).connect(audioCtx.destination);
+      noise.start(now); noise.stop(now + dur);
+      // Random clap bursts (short transients)
+      for(let k=0;k<12;k++){
+        const t = now + 0.1 + Math.random()*1.2;
+        const burst = audioCtx.createBufferSource(); burst.buffer = buffer;
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.6, t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t+0.18);
+        const bp2 = audioCtx.createBiquadFilter(); bp2.type='bandpass'; bp2.frequency.value = 2200 + Math.random()*600; bp2.Q.value = 1.2;
+        burst.connect(bp2).connect(g).connect(audioCtx.destination);
+        burst.start(t); burst.stop(t + 0.2);
+      }
     }
 
     function launchConfetti(x,y){
@@ -266,14 +306,19 @@
       }
     }
 
-    // Sample notes to demo
-    const sample = [
-      {name:'Alex', text:'Launched new workflow', color:'#7372B5'},
-      {name:'Sam', text:'Mentored 3 teammates', color:'#6C4597'},
-      {name:'Riley', text:'Improved SLA by 12%', color:'#702162'}
-    ];
-    const cakeTopYConst = cakeTopY;
-    sample.forEach((n,i)=>{ n.x = cakeLeftX + 60 + i*150; n.y = cakeTopYConst + 15; n.angle = randomAngle(); createNote(n); });
+    function showCelebrationModal(name, text){
+      const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
+      const modal = document.createElement('div'); modal.className = 'modal';
+      const h = document.createElement('h3'); h.textContent = (name? name+"'s accomplishment" : 'Accomplishment');
+      const p = document.createElement('p'); p.textContent = text || '🎉 Great job!';
+      modal.appendChild(h); modal.appendChild(p); overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', ()=> overlay.remove());
+      setTimeout(()=> overlay.remove(), 1800);
+    }
+
+    // Initial demo notes
+    restoreDemoBtn.click();
   </script>
 </body>
 </html>
