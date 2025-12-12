@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accomplishment Cake</title>
+  <meta name="description" content="Add your accomplishment as a note on a cake. Click any note for sound + confetti!" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root { --bg: #F5F4F9; --primary: #4F1044; --accent: #6C4597; --dark: #3A2335; --cake1: #f6c8a0; --cake2: #e39a62; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--dark); display: grid; grid-template-rows: auto 1fr auto; min-height: 100vh; }
+    header { padding: 14px 20px; background: #fff; border-bottom: 4px solid #DAD5DB; display:flex; align-items:center; gap:14px; }
+    .brand h1 { margin:0; font-size:1.6rem; color: var(--primary); }
+    .cta { margin-left:auto; }
+    .cta button { border:none; background: var(--accent); color:white; padding:8px 12px; border-radius:8px; font-weight:700; cursor:pointer; box-shadow:0 2px 0 #702162; }
+    main { display: grid; grid-template-columns: 320px 1fr; gap: 16px; padding: 16px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    .panel { background:#fff; border:1px solid #DAD5DB; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.06); padding:14px; }
+    button.primary { border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; background: var(--primary); color:#fff; margin-top:12px; box-shadow:0 3px 0 #702162; }
+    button.secondary { background:#e8e3ef; color:#3A2335; box-shadow:none; border:none; padding:10px 14px; border-radius:10px; margin-top:12px; cursor:pointer; }
+    #stage { background: linear-gradient(#ffe9d2, var(--bg)); border:1px solid #DAD5DB; border-radius:12px; min-height:520px; overflow:hidden; position:relative; }
+    .confetti-piece { position:absolute; width:10px; height:18px; animation: fall 1200ms ease-out forwards; }
+    @keyframes fall { 0% { transform:translateY(0) rotate(0deg); opacity:1; } 100% { transform:translateY(140px) rotate(260deg); opacity:0; } }
+    .footer-tip { text-align:center; font-size:.95rem; padding:8px; opacity:.8; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div>
+        <h1>Accomplishment Cake</h1>
+        <small>Caring for People • Connecting Communities • Promoting Peace</small>
+      </div>
+    </div>
+    <div class="cta"><button onclick="document.getElementById('importFile').click()">Import notes</button></div>
+  </header>
+
+  <main>
+    <section class="panel" id="controls">
+      <h2>Add Your Note</h2>
+      <div class="row">
+        <div>
+          <label for="name">Your name</label>
+          <input id="name" placeholder="e.g., Alex" />
+        </div>
+        <div>
+          <label for="color">Note color</label>
+          <input id="color" type="color" value="#6C4597" />
+        </div>
+      </div>
+      <label for="text">Accomplishment (short sentence)</label>
+      <textarea id="text" rows="3" placeholder="What are you most proud of this year?"></textarea>
+      <div class="controls-row">
+        <button class="primary" id="addBtn">Add note to cake</button>
+        <button class="secondary" id="shuffleBtn" title="Re‑arrange notes">Shuffle positions</button>
+        <button class="secondary" id="exportBtn" title="Save the notes as a JSON file">Export</button>
+        <label class="tiny" for="importFile">Import</label>
+        <input type="file" id="importFile" accept="application/json" />
+      </div>
+      <p class="tiny">Tip: Drag notes to reposition. Double‑click a note to edit it.</p>
+    </section>
+
+    <section class="panel" id="stage-wrapper">
+      <div id="stage">
+        <svg id="svg" viewBox="0 0 900 550" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%;">
+          <defs>
+            <linearGradient id="sponge" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="var(--cake1)"/>
+              <stop offset="100%" stop-color="var(--cake2)"/>
+            </linearGradient>
+            <linearGradient id="frost" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#fff"/>
+              <stop offset="100%" stop-color="#f5e8ff"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="450" cy="440" rx="280" ry="30" fill="#e6d9c8"/>
+          <rect x="240" y="250" width="420" height="170" rx="26" ry="26" fill="url(#sponge)" stroke="#c17f4a" stroke-width="3"/>
+          <path d="M260 250 h380 q20 0 20 20 v10 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 q-20 30 -40 0 v-10 q0 -20 20 -20 z" fill="url(#frost)" stroke="#e7d7ff" stroke-width="3"/>
+          <g id="candles">
+            <rect x="340" y="210" width="16" height="40" rx="4" fill="#7372B5" />
+            <rect x="400" y="205" width="16" height="45" rx="4" fill="#6C4597" />
+            <rect x="460" y="215" width="16" height="35" rx="4" fill="#702162" />
+            <rect x="520" y="200" width="16" height="50" rx="4" fill="#4F1044" />
+            <circle cx="348" cy="208" r="6" fill="#ffa62b"/>
+            <circle cx="408" cy="203" r="6" fill="#ffa62b"/>
+            <circle cx="468" cy="213" r="6" fill="#ffa62b"/>
+            <circle cx="528" cy="198" r="6" fill="#ffa62b"/>
+          </g>
+          <g id="notes"></g>
+        </svg>
+      </div>
+      <div class="footer-tip">Click any note to celebrate 🎉</div>
+    </section>
+  </main>
+
+  <footer>© 2025</footer>
+
+  <script>
+    const svg = document.getElementById('svg');
+    const notesLayer = document.getElementById('notes');
+    const addBtn = document.getElementById('addBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const importFile = document.getElementById('importFile');
+    const nameInput = document.getElementById('name');
+    const textInput = document.getElementById('text');
+    const colorInput = document.getElementById('color');
+
+    let audioCtx = null;
+    let notes = [];
+    let idSeq = 1;
+
+    const cakeTopY = 250; // frosting baseline
+    const cakeLeftX = 240, cakeRightX = 660;
+
+    function randomXOnCakeTop(){
+      const padding = 20;
+      return cakeLeftX + padding + Math.random() * (cakeRightX - cakeLeftX - 2*padding);
+    }
+    function randomAngle(){ return -10 + Math.random()*20; }
+
+    function createNote({name, text, color, x, y, angle}){
+      const id = idSeq++;
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+      // stick line
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', x); line.setAttribute('y1', y); line.setAttribute('x2', x); line.setAttribute('y2', y-70);
+      line.setAttribute('stroke', '#7a6a5a'); line.setAttribute('stroke-width', '3');
+      g.appendChild(line);
+
+      // label
+      const label = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      label.setAttribute('x', x-90); label.setAttribute('y', y-110); label.setAttribute('width', 180); label.setAttribute('height', 40); label.setAttribute('rx', 10);
+      label.setAttribute('fill', color || '#6C4597'); label.setAttribute('stroke', '#6f5e4e'); label.setAttribute('stroke-width', 2);
+      g.appendChild(label);
+
+      // text
+      const textNode = document.createElementNS('http://www.w3.org/2000/svg','text');
+      textNode.setAttribute('x', x); textNode.setAttribute('y', y-85);
+      textNode.setAttribute('text-anchor', 'middle');
+      textNode.setAttribute('font-size', '14'); textNode.setAttribute('font-weight', '700');
+      textNode.setAttribute('fill', '#3A2335');
+      textNode.textContent = (name? name+': ' : '') + text;
+      g.appendChild(textNode);
+
+      g.setAttribute('transform', 'rotate('+(angle||0)+','+x+','+y+')');
+
+      // click celebrate
+      g.addEventListener('click', (ev)=>{
+        playCelebration();
+        launchConfetti(ev.offsetX||x, ev.offsetY||y-100);
+      });
+
+      // drag
+      let dragging=false, start;
+      g.addEventListener('pointerdown', (ev)=>{ dragging=true; start={x:ev.clientX, y:ev.clientY}; g.setPointerCapture(ev.pointerId); });
+      g.addEventListener('pointermove', (ev)=>{
+        if(!dragging) return;
+        const dx = ev.clientX - start.x; const dy = ev.clientY - start.y;
+        const pt = svg.createSVGPoint(); pt.x = x + dx; pt.y = y + dy;
+        const ctm = svg.getScreenCTM().inverse(); const loc = pt.matrixTransform(ctm);
+        const nx = loc.x; const ny = loc.y;
+        line.setAttribute('x1', nx); line.setAttribute('x2', nx);
+        line.setAttribute('y1', ny); line.setAttribute('y2', ny-70);
+        label.setAttribute('x', nx-90); label.setAttribute('y', ny-110);
+        textNode.setAttribute('x', nx); textNode.setAttribute('y', ny-85);
+        g.setAttribute('transform', 'rotate('+angle+','+nx+','+ny+')');
+      });
+      g.addEventListener('pointerup', ()=>{ dragging=false; });
+
+      notesLayer.appendChild(g);
+      const obj = {id, name, text, color, x, y, angle};
+      notes.push(obj);
+      return obj;
+    }
+
+    function addNoteFromForm(){
+      const name = nameInput.value.trim();
+      const text = textInput.value.trim();
+      if(!text){ alert('Please add a short accomplishment.'); return; }
+      const color = colorInput.value;
+      const x = randomXOnCakeTop();
+      const y = cakeTopY + 10 + Math.random()*20;
+      const angle = randomAngle();
+      createNote({name, text, color, x, y, angle});
+      nameInput.value = '';
+      textInput.value = '';
+    }
+    addBtn.addEventListener('click', addNoteFromForm);
+
+    shuffleBtn.addEventListener('click', ()=>{
+      const n = notes.length; if(n===0) return;
+      const span = (cakeRightX - cakeLeftX - 40);
+      notes.forEach((note, i)=>{
+        const x = cakeLeftX + 20 + (span) * (i+0.5)/n;
+        const y = cakeTopY + 15;
+        note.x = x; note.y = y; note.angle = randomAngle();
+      });
+      while(notesLayer.firstChild) notesLayer.removeChild(notesLayer.firstChild);
+      const copy = [...notes]; notes = []; idSeq = 1; copy.forEach(n=>createNote(n));
+    });
+
+    exportBtn.addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify({notes}, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'accomplishment_cake_notes.json';
+      a.click();
+    });
+
+    importFile.addEventListener('change', async (ev)=>{
+      const f = ev.target.files[0]; if(!f) return;
+      const text = await f.text();
+      try{
+        const obj = JSON.parse(text);
+        while(notesLayer.firstChild) notesLayer.removeChild(notesLayer.firstChild);
+        notes = []; idSeq = 1;
+        (obj.notes||[]).forEach(n=>createNote(n));
+      }catch(e){ alert('Invalid JSON file.'); }
+    });
+
+    function playCelebration(){
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      const duration = 0.8;
+      const freqs = [523.25, 659.25, 783.99];
+      freqs.forEach((f,i)=>{
+        const osc = audioCtx.createOscillator();
+        osc.type = 'triangle'; osc.frequency.value = f;
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.5, now + 0.05 + i*0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + duration);
+      });
+      const bufferSize = audioCtx.sampleRate * 0.25;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufferSize);
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer; const ng = audioCtx.createGain();
+      ng.gain.setValueAtTime(0.3, now); ng.gain.exponentialRampToValueAtTime(0.001, now+0.25);
+      noise.connect(ng).connect(audioCtx.destination);
+      noise.start(now);
+    }
+
+    function launchConfetti(x,y){
+      const colors = ['#6C4597','#7372B5','#702162','#4F1044','#ffd166','#06d6a0'];
+      const container = document.getElementById('stage');
+      for(let i=0;i<24;i++){
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        const left = (x + (Math.random()*60-30));
+        const top = (y);
+        piece.style.left = left + 'px';
+        piece.style.top = top + 'px';
+        piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+        piece.style.transform = 'rotate('+(Math.random()*360)+'deg)';
+        piece.style.borderRadius = Math.random()>0.5 ? '3px' : '0px';
+        container.appendChild(piece);
+        setTimeout(()=> piece.remove(), 1300);
+      }
+    }
+
+    // Sample notes to demo
+    const sample = [
+      {name:'Alex', text:'Launched new workflow', color:'#7372B5'},
+      {name:'Sam', text:'Mentored 3 teammates', color:'#6C4597'},
+      {name:'Riley', text:'Improved SLA by 12%', color:'#702162'}
+    ];
+    const cakeTopYConst = cakeTopY;
+    sample.forEach((n,i)=>{ n.x = cakeLeftX + 60 + i*150; n.y = cakeTopYConst + 15; n.angle = randomAngle(); createNote(n); });
+  </script>
+</body>
+</html>
