@@ -1,4 +1,4 @@
-# Accomplishment Cake (NYAP Colors) — GitHub Pages
+# Accomplishment Cake ( Colors) — GitHub Pages
 
 Now with:
 - Celebration **popup** with **applause** sound.
